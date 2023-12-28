@@ -4,7 +4,7 @@ import { FormQuestionType, QuestionType } from "./FormQuestionType";
 import { useState } from "react";
 import FormQuestionInput from "./FormQuestionInput";
 import { MultipleOption } from "./FormRadioGroup";
-import { QuestionItem } from "../containers/CreateForm";
+import { QuestionItem } from "../containers/DynamicForm";
 import { Trash } from "lucide-react";
 
 type FormQuestionProps = {

@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useRef, useState } from "react";
-import { QuestionItem } from "../containers/CreateForm";
+import { QuestionItem } from "../containers/DynamicForm";
 import { CheckCircle, Circle, Edit, Trash } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { checkIfOption, convertStringToSlug, isLabelValid } from "../utils";
@@ -12,7 +12,7 @@ import { FormAddOptionButton } from "./FormAddOptionButton";
 export type Option = {
   id: string;
   label: string;
-  isChecked?:boolean;
+  isChecked?: boolean;
 };
 
 export type MultipleOption = Option[]
@@ -83,14 +83,12 @@ export function FormRadioGroup({ question, onChange }: FormRadioGroupProps) {
         {options.map(({ label, id }) => (
           <div className="grid grid-cols-2">
             <div className="flex items-center gap-2 min-h-[40px]" key={id}>
-              <Input defaultValue={ editingOption?.label} className={cn("hidden", {
-                "block": editingOption?.id === id,
-                "border border-input": editingOption?.id !== id,
-                "border border-primary": editingOption?.id === id
-              })}
-                ref={inputEdiRef}
-                onBlur={(e) => handleUpdateOption(e.target.id ?? "")}
-              />
+              {editingOption?.id === id ? 
+                <Input
+                  defaultValue={editingOption?.label}
+                  ref={inputEdiRef}
+                  onBlur={(e) => handleUpdateOption(e.target.id ?? "")}
+                /> : null}
               <div className={cn("flex items-center gap-2", { "hidden": editingOption?.id === id })}>
                 <RadioGroupItem value={id} id={id} />
                 <Label htmlFor={id}>{label}</Label>
@@ -104,7 +102,7 @@ export function FormRadioGroup({ question, onChange }: FormRadioGroupProps) {
           </div>
         ))}
       </RadioGroup>
-      <FormAddOptionButton onAddOption={handleAddOption} ref={inputAddRef}/>
+      <FormAddOptionButton onAddOption={handleAddOption} ref={inputAddRef} />
     </div>
   );
 }

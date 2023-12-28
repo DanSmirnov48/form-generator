@@ -1,7 +1,7 @@
 "use client"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import { QuestionItem } from "../containers/CreateForm"
+import { QuestionItem } from "../containers/DynamicForm"
 import { Input } from "@/components/ui/input"
 import { useRef, useState } from "react"
 import { cn } from "@/lib/utils"
@@ -94,14 +94,12 @@ export function FormCheckBoxes({ question, onChange }: FormCheckBoxesProps) {
       {options.map(({ id, label, isChecked }) => (
         <div className="grid grid-cols-2">
           <div key={id} className="flex items-center gap-2 min-h-[40px]">
-            <Input defaultValue={editingOption?.label} className={cn("hidden", {
-              "block": editingOption?.id === id,
-              "border border-input": editingOption?.id !== id,
-              "border border-primary": editingOption?.id === id
-            })}
-              ref={inputEdiRef}
-              onBlur={(e) => handleUpdateOption(e.target.value ?? "")}
-            />
+            {editingOption?.id === id ? 
+              <Input
+                defaultValue={editingOption?.label}
+                ref={inputEdiRef}
+                onBlur={(e) => handleUpdateOption(e.target.value ?? "")}
+              /> : null}
             <div className={cn("flex items-center gap-2", { "hidden": editingOption?.id === id })}>
               <Checkbox
                 id={id}
