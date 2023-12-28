@@ -5,16 +5,18 @@ import { useState } from "react";
 import FormQuestionInput from "./FormQuestionInput";
 import { MultipleOption } from "./FormRadioGroup";
 import { QuestionItem } from "../containers/CreateForm";
+import { Trash } from "lucide-react";
 
 type FormQuestionProps = {
   question: QuestionItem;
   onChange: (question: Partial<QuestionItem>) => void;
+  onDelete: () => void
 };
 
-const FormQuestion = ({ question, onChange }: FormQuestionProps) => {
+const FormQuestion = ({ question, onChange, onDelete }: FormQuestionProps) => {
   const { questionType } = question;
   return (
-    <Card>
+    <Card className="relative pt-8">
       <CardHeader className="flex flex-col gap-2">
         <CardTitle>
           <Input type="text" placeholder="Question" name="question" onChange={(e) => {
@@ -40,6 +42,10 @@ const FormQuestion = ({ question, onChange }: FormQuestionProps) => {
           }
         />
       </CardContent>
+      <Trash
+        className="w-8 h-8 cursor-pointer absolute right-[-10px] top-[-10px] bg-red-600 rounded-full text-white p-2"
+        onClick={onDelete}
+      />
     </Card>
   );
 };

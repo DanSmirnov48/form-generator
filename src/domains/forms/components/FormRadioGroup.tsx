@@ -6,27 +6,16 @@ import { useRef, useState } from "react";
 import { QuestionItem } from "../containers/CreateForm";
 import { CheckCircle, Circle, Edit, Trash } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { checkIfOption, convertStringToSlug, isLabelValid } from "../utils";
+import { FormAddOptionButton } from "./FormAddOptionButton";
 
-type Option = {
-  value: string;
+export type Option = {
+  id: string;
   label: string;
+  isChecked?:boolean;
 };
 
 export type MultipleOption = Option[]
-
-const convertStringToSlug = (text: string) => {
-  return text.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-};
-
-const checkIfOption = (options: Option[], label: string) => {
-  return options.some((option) => option.label.trim() === label.trim());
-};
-
-const isLabelValid = ({ currentLabel, options }: { currentLabel: string, options: Option[] }) => {
-  return typeof currentLabel === "string"
-    && currentLabel.length > 0 &&
-    !checkIfOption(options, currentLabel)
-}
 
 type FormRadioGroupProps = {
   question?: Partial<QuestionItem>;
@@ -44,7 +33,7 @@ export function FormRadioGroup({ question, onChange }: FormRadioGroupProps) {
 
     if (typeof currentLabel === "string" && isLabelValid({ currentLabel, options })) {
       const option = {
-        value: convertStringToSlug(currentLabel),
+        id: convertStringToSlug(currentLabel),
         label: currentLabel,
       };
       onChange?.({
@@ -55,26 +44,26 @@ export function FormRadioGroup({ question, onChange }: FormRadioGroupProps) {
     }
   };
 
-  const handleRemoveOption = (value: string) => {
+  const handleRemoveOption = (id: string) => {
     onChange?.({
       ...question,
-      options: options.filter((o) => o.value !== value)
+      options: options.filter((o) => o.id !== id)
     })
   }
 
-  const handleEditOption = (value: string) => {
-    const option = options.find((o) => o.value == value)
+  const handleEditOption = (id: string) => {
+    const option = options.find((o) => o.id == id)
     setEditingOption(option ?? null)
   }
 
   const handleUpdateOption = (newLabel: string) => {
     if (typeof newLabel === "string" && isLabelValid({ currentLabel: newLabel, options })) {
-      const newValue = convertStringToSlug(newLabel)
+      const newId = convertStringToSlug(newLabel)
       const newOptions = options.map((option) => {
-        if (option.value === editingOption?.value) {
+        if (option.id === editingOption?.id) {
           return {
             ...option,
-            value: newValue,
+            id: newId,
             label: newLabel
           }
         }
@@ -91,36 +80,31 @@ export function FormRadioGroup({ question, onChange }: FormRadioGroupProps) {
   return (
     <div className="w-full grid gap-4">
       <RadioGroup className="w-full grid gap-4">
-        {options.map(({ label, value }) => (
+        {options.map(({ label, id }) => (
           <div className="grid grid-cols-2">
-            <div className="flex items-center gap-2 min-h-[40px]" key={value}>
+            <div className="flex items-center gap-2 min-h-[40px]" key={id}>
               <Input defaultValue={ editingOption?.label} className={cn("hidden", {
-                "block": editingOption?.value === value,
-                "border border-input": editingOption?.value !== value,
-                "border border-primary": editingOption?.value === value
+                "block": editingOption?.id === id,
+                "border border-input": editingOption?.id !== id,
+                "border border-primary": editingOption?.id === id
               })}
                 ref={inputEdiRef}
-                onBlur={(e) => handleUpdateOption(e.target.value ?? "")}
+                onBlur={(e) => handleUpdateOption(e.target.id ?? "")}
               />
-              <div className={cn("flex items-center gap-2", { "hidden": editingOption?.value === value })}>
-                <RadioGroupItem value={value} id={value} />
-                <Label htmlFor={value}>{label}</Label>
+              <div className={cn("flex items-center gap-2", { "hidden": editingOption?.id === id })}>
+                <RadioGroupItem value={id} id={id} />
+                <Label htmlFor={id}>{label}</Label>
               </div>
             </div>
             <div className="flex justify-end gap-2">
-              <Trash className="cursor-pointer" onClick={() => handleRemoveOption(value)} />
-              <Edit className="cursor-pointer" onClick={() => handleEditOption(value)} />
+              <Trash className="cursor-pointer" onClick={() => handleRemoveOption(id)} />
+              <Edit className="cursor-pointer" onClick={() => handleEditOption(id)} />
               <CheckCircle className="cursor-pointer" onClick={() => setEditingOption(null)} />
             </div>
           </div>
         ))}
       </RadioGroup>
-      <div className="flex gap-2">
-        <Input placeholder="Add option" ref={inputAddRef} className="" />
-        <Button type="button" onClick={handleAddOption}>
-          Add option
-        </Button>
-      </div>
+      <FormAddOptionButton onAddOption={handleAddOption} ref={inputAddRef}/>
     </div>
   );
 }
